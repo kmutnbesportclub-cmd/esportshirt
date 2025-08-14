@@ -37,7 +37,7 @@ export default function Page() {
         dpr={[1, 2]}
         camera={{ position: [0, 0, 5], fov: 50 }}
       >
-        <color attach="background" args={["#0b1221"]} />
+        <color attach="background" args={["#707070"]} />
         <ambientLight intensity={0.5} />
         <directionalLight
           position={[5, 6, 5]}
