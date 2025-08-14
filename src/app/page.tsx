@@ -1,14 +1,15 @@
 'use client'
 
 import React, { Suspense, useRef, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, Environment, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
 // Load model from public folder and center pivot
 function Model() {
   const gltf = useGLTF('/Collared-Shirt.glb') // place model.glb inside public/
-  const modelRef = useRef<THREE.Object3D | null>(null)
+  const modelRef = useRef<THREE.Object3D>(null)
+  const { camera } = useThree()
 
   useEffect(() => {
     if (modelRef.current) {
@@ -16,8 +17,14 @@ function Model() {
       const box = new THREE.Box3().setFromObject(modelRef.current)
       const center = box.getCenter(new THREE.Vector3())
       modelRef.current.position.sub(center)
+
+      // Move camera to face the chest area (front of shirt)
+      const size = box.getSize(new THREE.Vector3())
+      const frontPos = new THREE.Vector3(center.x, center.y, box.max.z + size.z)
+      camera.position.set(frontPos.x, center.y, frontPos.z + 2)
+      camera.lookAt(new THREE.Vector3(center.x, center.y, center.z))
     }
-  }, [])
+  }, [camera])
 
   return <primitive ref={modelRef} object={gltf.scene} scale={1} />
 }
@@ -28,9 +35,9 @@ export default function Page() {
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [3, 2.5, 3], fov: 50 }}
+        camera={{ position: [0, 0, 5], fov: 50 }}
       >
-        <color attach="background" args={["#707070"]} />
+        <color attach="background" args={["#0b1221"]} />
         <ambientLight intensity={0.5} />
         <directionalLight
           position={[5, 6, 5]}
